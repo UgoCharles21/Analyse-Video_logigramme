@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="fr">
+<
+  h+=\'<div class="summary-row"><span class="summary-label">Groupe</span><span class="summary-value">\'+( si.groupe||\'—\')+\'</span></div>\';\n  h+=\'<div class="summary-row"><span class="summary-label">Code étudiant</span><span class="summary-value">\'+( si.code||\'—\')+\'</span></div>\';html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -159,6 +160,7 @@ h1 span{color:var(--accent);}
 .btn-print{background:rgba(34,211,160,.1);border:1px solid rgba(34,211,160,.3);border-radius:10px;padding:14px 20px;color:var(--accent3);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .btn-print:hover{background:rgba(34,211,160,.2);transform:translateY(-2px);}
 .btn-copy{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:14px 20px;color:#a78bfa;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-submit{background:rgba(34,211,160,.1);border:1px solid rgba(34,211,160,.3);border-radius:10px;padding:12px 20px;color:var(--accent3);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
 .btn-copy:hover{background:rgba(167,139,250,.2);transform:translateY(-2px);}
 .copy-confirm{text-align:center;font-size:12px;color:var(--accent3);margin-top:10px;height:18px;}
 
@@ -1186,6 +1188,7 @@ function renderIdent(){
   h+='<div class="form-group"><label>Prénom <span class="required-badge">*</span></label><input type="text" id="prenom" placeholder="Prénom"></div></div>';
   h+='<div class="form-grid"><div class="form-group"><label>Date</label><input type="date" id="date" value="'+ds+'"></div>';
   h+='<div class="form-group"><label>N° séance <span class="required-badge">*</span></label><input type="number" id="seance" placeholder="Ex : 3" min="1" max="20"></div></div>';
+  h+='<div class="form-grid"><div class="form-group"><label>Groupe <span class="required-badge">*</span></label><input type="text" id="groupe" placeholder="Ex : 01, 02, A, B…"></div><div class="form-group"><label>Code étudiant <span class="required-badge">*</span></label><input type="text" id="code_etudiant" placeholder="Prénom + 3 derniers chiffres du matricule"></div></div>';
   h+='<div class="form-grid"><div class="form-group"><label>Activité physique <span class="required-badge">*</span></label><input type="text" id="activite" placeholder="Ex : Natation, Basketball, Arts martiaux…"></div>';
   h+='<div class="form-group"><label>Technique analysée <span class="required-badge">*</span></label><input type="text" id="technique" placeholder="Ex : Crawl, Lancer franc, Mae-geri…"></div></div></div>';
   h+='<div class="card" style="margin-top:0"><span class="step-tag">Objectifs — Avant l’analyse</span><h2>Définis tes objectifs et indicateurs de performance</h2><p>Ces objectifs guident ton analyse. Tu pourras les réviser après avoir identifié ta famille d’erreurs.</p>';
@@ -1264,10 +1267,12 @@ function submitIdent(){
   var date=document.getElementById('date').value;
   var seance=document.getElementById('seance').value.trim();
   var activite=document.getElementById('activite').value.trim();
+  var groupe=(document.getElementById('groupe')||{value:''}).value.trim();
+  var code_etudiant=(document.getElementById('code_etudiant')||{value:''}).value.trim();
   var technique=document.getElementById('technique').value.trim();
   var objGlobal=document.getElementById('objGlobal').value.trim();
   var errEl=document.getElementById('identError');
-  if(!nom||!prenom||!seance||!activite||!technique){errEl.textContent='⚠️ Remplis tous les champs obligatoires.';errEl.style.display='block';return;}
+  if(!nom||!prenom||!seance||!activite||!technique||!groupe||!code_etudiant){errEl.textContent='⚠️ Remplis tous les champs obligatoires.';errEl.style.display='block';return;}
   if(!objGlobal){errEl.textContent='⚠️ Ton objectif global est obligatoire.';errEl.style.display='block';return;}
   var objs=collectObjectives();
   if(!objs.length||!objs[0].desc){errEl.textContent='⚠️ Au moins un objectif stratégique est requis.';errEl.style.display='block';return;}
@@ -1275,7 +1280,7 @@ function submitIdent(){
     if(!objs[i].desc){errEl.textContent='⚠️ Décris l’objectif stratégique '+(i+1)+'.';errEl.style.display='block';return;}
     if(objs[i].indicators.length<3){errEl.textContent='⚠️ L’objectif '+(i+1)+' doit avoir au moins 3 indicateurs remplis.';errEl.style.display='block';return;}
   }
-  studentInfo={nom:nom,prenom:prenom,date:date,seance:seance,activite:activite,technique:technique,objGlobal:objGlobal,objectives:objs};
+  studentInfo={nom:nom,prenom:prenom,groupe:groupe,code:code_etudiant,date:date,seance:seance,activite:activite,technique:technique,objGlobal:objGlobal,objectives:objs};
   navHistory.push('ident');currentStep='start';render();
 }
 
@@ -1392,7 +1397,9 @@ function renderSummaryBlock(f){
   var si=studentInfo;
   var dateF=si.date?si.date.split('-').reverse().join('/'):'';
   var h='<div class="summary-card"><h3>📌 Résumé de mon analyse</h3>';
-  h+='<div class="summary-row"><span class="summary-label">Étudiant(e)</span><span class="summary-value">'+si.prenom+' '+si.nom+'</span></div>';
+  h+='<div class="summary-row"><span class="summary-label">Étudiant(e)</span><span class="summary-value">'+si.prenom+' '+si.nom+'</span></div>';  h+='<div class="summary-row"><span class="summary-label">Groupe</span><span class="summary-value">'+(si.groupe||'—')+'</span></div>';
+  h+='<div class="summary-row"><span class="summary-label">Code étudiant</span><span class="summary-value">'+(si.code||'—')+'</span></div>';
+
   h+='<div class="summary-row"><span class="summary-label">Date</span><span class="summary-value">'+dateF+'</span></div>';
   h+='<div class="summary-row"><span class="summary-label">Séance</span><span class="summary-value">Séance n° '+si.seance+'</span></div>';
   h+='<div class="summary-row"><span class="summary-label">Activité</span><span class="summary-value">'+si.activite+'</span></div>';
@@ -1437,7 +1444,7 @@ function renderRevisedObjectives(f){
   h+='<textarea id="revGlobal" placeholder="Réécris ton objectif global…">'+escHTML(studentInfo.objGlobal||'')+'</textarea></div>';
   h+='<div id="revObjList"></div>';
   h+='<button class="btn-add-obj" id="btnAddRevObj" onclick="addRevObjective()">+ Ajouter un objectif stratégique révisé</button>';
-  h+='<div class="action-btns" style="margin-top:24px"><button class="btn-print" onclick="printSummary()">🖨️ Imprimer</button><button class="btn-copy" onclick="copySummary()">📋 Copier le texte</button></div>';
+  h+='<div class="action-btns" style="margin-top:24px"><button class="btn-print" onclick="printSummary()">🖨️ Imprimer</button><button class="btn-copy" onclick="copySummary()">📋 Copier le texte</button><button class="btn-submit" onclick="submitToForms()">📤 Soumettre à l\'enseignant</button></div>';
   h+='<div class="copy-confirm" id="copyConfirm"></div></div>';
   return h;
 }
@@ -1502,6 +1509,8 @@ function copySummary(){
 
   var t='ANALYSE VIDÉO DE MES HABILETÉS SPORTIVES\n'+'='.repeat(46)+'\n';
   t+='Étudiant(e)      : '+si.prenom+' '+si.nom+'\n';
+  t+='Groupe          : '+(si.groupe||'—')+'\n';
+  t+='Code étudiant   : '+(si.code||'—')+'\n';
   t+='Date            : '+dateF+'\n';
   t+='Séance          : '+si.seance+'\n';
   t+='Activité        : '+si.activite+'\n';
@@ -1547,6 +1556,52 @@ function renderNoError(){
 }
 
 render();
+
+function submitToForms(){
+  var si=studentInfo;
+  var f=detectedFamily?families[detectedFamily]:null;
+  if(!f){alert("Complète d'abord ton analyse avant de soumettre.");return;}
+  
+  var obsText='';
+  var stepLabel2={closed_posture:'Posture de départ',open_posture:'Posture de départ',closed_chain:'Chaîne cinétique',open_chain:'Chaîne cinétique',closed_timing:'Timing et accélération',closed_tension:'Tension musculaire',open_tension:'Tension musculaire',closed_transfer:'Transfert d énergie',open_transfer:'Transfert d énergie',open_anticipation:'Anticipation'};
+  var obsKeys=Object.keys(stepObservations);
+  for(var k=0;k<obsKeys.length;k++){
+    var sk=obsKeys[k];var so=stepObservations[sk];
+    if((so.checked&&so.checked.length)||so.free){
+      obsText+='['+( stepLabel2[sk]||sk)+']\n';
+      if(so.checked)for(var ci=0;ci<so.checked.length;ci++)obsText+='  + '+so.checked[ci]+'\n';
+      if(so.free)obsText+='  Note : '+so.free+'\n';
+      obsText+='\n';
+    }
+  }
+  
+  var revObjs=collectRevObjectives();
+  var rgEl=document.getElementById('revGlobal');
+  var revGlobal=rgEl?rgEl.value.trim():'';
+  var revText=revGlobal?'Objectif global : '+revGlobal+'\n\n':'';
+  for(var i=0;i<revObjs.length;i++){
+    revText+='Obj '+(i+1)+' : '+(revObjs[i].desc||'')+'\n';
+    for(var j=0;j<revObjs[i].indicators.length;j++)revText+='  + '+revObjs[i].indicators[j]+'\n';
+  }
+  
+  var famille='F'+f.num+' — '+f.title;
+  var base='https://forms.office.com/Pages/ResponsePage.aspx?id=cUhHBo9WhkeeN0Q85wsaz9M_Ob2eudxIjDpk-IQaXqtUM0MzWTM4RzFHT0hQMFNVM1NLUzNRUDNNSyQlQCNjPTEu';
+  
+  var url=base
+    +'&r1='+encodeURIComponent(si.code||'')
+    +'&r2='+encodeURIComponent(si.groupe||'')
+    +'&r3='+encodeURIComponent(si.activite||'')
+    +'&r4='+encodeURIComponent(si.technique||'')
+    +'&r5='+encodeURIComponent(si.seance||'')
+    +'&r6='+encodeURIComponent(si.date||'')
+    +'&r8='+encodeURIComponent(si.objGlobal||'')
+    +'&r9='+encodeURIComponent(obsText)
+    +'&r10='+encodeURIComponent(revText);
+  
+  alert("Ton formulaire va s\'ouvrir dans un nouvel onglet.\n\nLa famille identifiée est :\n" + famille + "\n\nSélectionne-la dans le champ \"Famille d\'erreurs\".");
+  window.open(url,'_blank');
+}
+
 </script>
 </body>
 </html>
